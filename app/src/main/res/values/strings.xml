@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Geonotes</string>
+    <string name="google_app_id">721195347972</string>
+    <string name="title_activity_main">GeoNotes</string>
+    <string name="newNote">New Note</string>
+    <string name="Location">Location:</string>
+    <string name="noteTypeLabel">Note Type:</string>
+    <string name="userLabel">User:</string>
+    <string name="addNoteButton">Add Note</string>
+    <string name="add_note_activity">Add Note</string>
+    <string name="addNoteHintText">This place smells funny</string>
+    <string name="noteDetails">Note Details</string>
+    <string name="apiURL">http://emogency.com/geonotes/api/</string>
+
+</resources>
