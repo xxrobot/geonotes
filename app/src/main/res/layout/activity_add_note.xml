@@ -29,12 +29,6 @@
                 android:hint="@string/addNoteHintText"
                 android:inputType="textMultiLine" />
 
-            <TextView
-                style="@style/headerText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/noteDetails" />
-
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -94,12 +88,6 @@
                     android:layout_toRightOf="@id/userLabel"
                     android:text="Lat: 123, Lng: 123" />
             </LinearLayout>
-
-            <TextView
-                style="@style/headerText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Debug" />
 
             <TextView
                 android:id="@+id/jsonData"

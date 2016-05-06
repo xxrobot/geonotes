@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -157,7 +158,7 @@ public class addNote extends AppCompatActivity {
 
 
 
-        //        Gets preferences for Username
+        //Gets username from SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
         String username = settings.getString("username","geouser");
 
@@ -184,12 +185,12 @@ public class addNote extends AppCompatActivity {
         //save username
 
 
-        TextView username = (TextView) findViewById(R.id.user);
-        Log.e("Addnote","try to save username" + username);
+        EditText username = (EditText) findViewById(R.id.user);
+        Log.e("Addnote","saving username to prefs" + username.getText().toString());
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("user",username.toString());
+        editor.putString("username",username.getText().toString());
         //commit changes
         editor.commit();
 
