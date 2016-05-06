@@ -25,7 +25,7 @@ import java.net.URLEncoder;
 public class addNote extends AppCompatActivity {
     String lat;
     String lng;
-    String TAG="addNote";
+    String TAG = "addNote";
     //Shared Preferences Name
     public static final String PREFS_NAME = "geonotesPrefs";
 
@@ -41,13 +41,14 @@ public class addNote extends AppCompatActivity {
 
 
     //This is the button handler for submit note
-    public void submitNote(View view){
+    public void submitNote(View view) {
 
         TextView userTextView = (TextView) findViewById(R.id.user);
         String user = userTextView.getText().toString();
 
-        TextView typeTextView = (TextView) findViewById(R.id.type);
-        String type = typeTextView.getText().toString();
+//        TextView typeTextView = (TextView) findViewById(R.id.type);
+//        String type = typeTextView.getText().toString();
+        String type = "text";
 
         final TextView noteTextView = (TextView) findViewById(R.id.note);
 
@@ -66,7 +67,7 @@ public class addNote extends AppCompatActivity {
         //String JsonURL = "http://192.168.1.10/geonotes/api/add.php?user="+user+"&lat="+lat+"&lng="+lng+"&type="+type+"&data="+note;
 
         String apiURL = getResources().getString(R.string.apiURL);
-        String JsonURL = apiURL + "add.php?user="+user+"&lat="+lat+"&lng="+lng+"&type="+type+"&data="+note;
+        String JsonURL = apiURL + "add.php?user=" + user + "&lat=" + lat + "&lng=" + lng + "&type=" + type + "&data=" + note;
 
         // Creating the JsonObjectRequest class called obreq, passing required parameters:
         //GET is used to fetch data from the server, JsonURL is the URL to be fetched from.
@@ -109,7 +110,7 @@ public class addNote extends AppCompatActivity {
                             // Adds the data string to the TextView "results"
                             results.setText(response.getString("message"));
 
-                            if(response.getInt("status")==200){
+                            if (response.getInt("status") == 200) {
                                 noteTextView.setText("");
                                 noteTextView.setInputType(0);
 
@@ -156,13 +157,11 @@ public class addNote extends AppCompatActivity {
         debugTextView.setText(lat + lng);
 
 
-
-
         //Gets username from SharedPreferences
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
-        String username = settings.getString("username","geouser");
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        String username = settings.getString("username", "geouser");
 
-        Log.e("Addnote","try to get username in prefs: " + username);
+        Log.e("Addnote", "try to get username in prefs: " + username);
 
         TextView myUsername = (TextView) findViewById(R.id.user);
         myUsername.setText(username);
@@ -175,22 +174,19 @@ public class addNote extends AppCompatActivity {
         results = (TextView) findViewById(R.id.jsonData);
 
 
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        //save username
-
-
+        //save username to SharedPreferences
         EditText username = (EditText) findViewById(R.id.user);
-        Log.e("Addnote","saving username to prefs" + username.getText().toString());
+        Log.e("Addnote", "saving username to prefs" + username.getText().toString());
 
-        SharedPreferences settings = getSharedPreferences(PREFS_NAME,0);
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("username",username.getText().toString());
+        editor.putString("username", username.getText().toString());
         //commit changes
         editor.commit();
 
