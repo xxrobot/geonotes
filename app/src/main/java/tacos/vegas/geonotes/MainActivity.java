@@ -208,8 +208,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     //Get Nearby note markers
     public void getNearbyMarkers() {
         //String JsonURL = "http://192.168.1.10/geonotes/api/nearbyMarkers.php?lat="+lat+"&lng="+lng;
-        //String JsonURL = "http://192.168.1.10/geonotes/api/nearbyMarkers.php?lat="+lat+"&lng="+lng;
-
         String apiURL = getResources().getString(R.string.apiURL);
         String JsonURL = apiURL + "nearbyMarkers.php?lat=" + lat + "&lng=" + lng;
 

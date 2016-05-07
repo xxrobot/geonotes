@@ -1,5 +1,6 @@
 package tacos.vegas.geonotes;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -62,8 +64,6 @@ public class addNote extends AppCompatActivity {
 
 //        String JsonURL = "http://192.168.1.10/geonotes/api/add.php?user="+user+"&lat=54&lng=-115&type=text&data=androidteest";
 
-        //Log.v(TAG,"user" + user);
-
         //String JsonURL = "http://192.168.1.10/geonotes/api/add.php?user="+user+"&lat="+lat+"&lng="+lng+"&type="+type+"&data="+note;
 
         String apiURL = getResources().getString(R.string.apiURL);
@@ -80,32 +80,7 @@ public class addNote extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-//                            JSONObject obj = response.getJSONObject("colorObject");
-//                            // Retrieves the string labeled "colorName" and "description" from
-//                            //the response JSON Object
-//                            //and converts them into javascript objects
-//                            String color = obj.getString("colorName");
-//                            String desc = obj.getString("description");
-//
-//                            // Adds strings from object to the "data" string
-//                            data += "Color Name: " + color +
-//                                    "\nDescription : " + desc;
-//
-//                            // Adds the data string to the TextView "results"
-//                            results.setText(data);
 
-                            //JSONObject obj = response.getJSONObject("message");
-
-
-                            // Retrieves the string labeled "colorName" and "description" from
-                            //the response JSON Object
-                            //and converts them into javascript objects
-                            //String color = obj.getString("message");
-//                            String desc = obj.getString("description");
-
-                            // Adds strings from object to the "data" string
-//                            data += "Color Name: " + color +
-//                                    "\nDescription : " + desc;
 
                             // Adds the data string to the TextView "results"
                             results.setText(response.getString("message"));
@@ -117,12 +92,26 @@ public class addNote extends AppCompatActivity {
                                 //Send a Successful Toast
                                 //Toast.makeText(context, response.getString("message"), duration).show();
 
+
+
+                                Context context = getApplicationContext();
+                                CharSequence text = "Your note was added successfully!";
+                                int duration = Toast.LENGTH_LONG;
+
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+
                                 //return to main activity
                                 finish();
+                            }else{
+                                Context context = getApplicationContext();
+                                CharSequence text = "There was an issue adding your note";
+                                int duration = Toast.LENGTH_LONG;
 
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
                             }
-                            //Log.v(TAG,obj.toString());
-                            //Log.v(TAG,color);
+
                         }
                         // Try and catch are included to handle any errors due to JSON
                         catch (JSONException e) {
