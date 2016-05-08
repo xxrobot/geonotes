@@ -7,13 +7,16 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -32,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -39,24 +43,30 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
+    //Maps and Geolocation Stuff
     private GoogleMap mMap;
-
-    TextView txtOutputLat, txtOutputLng;
-    Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    String lat, lng;
-    String TAG = "GeoNotes MainActivity";
+    double lat = 36.1724563;
+    double lng = -115.141542;
+    //TextView txtOutputLat, txtOutputLng;
 
+    //Permissions
     int PERMISSION_ACCESS_FINE_LOCATION;
 
+    //View Notes stuff
+    ArrayList<DataModel> dataModels;
+    ListView listView;
+    private static CustomAdapter adapter;
 
-
+    //Debug Things
+    String TAG = "GeoNotes MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +77,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        txtOutputLat = (TextView) findViewById(R.id.textView);
-        txtOutputLng = (TextView) findViewById(R.id.textView2);
+        //txtOutputLat = (TextView) findViewById(R.id.textView);
+        //txtOutputLng = (TextView) findViewById(R.id.textView2);
 
         buildGoogleApiClient();
 
         // Creates the Volley request queue
         requestQueue = Volley.newRequestQueue(this);
 
-
+        //Begin View Notes Stuff
+        listView = (ListView) findViewById(R.id.list);
+        dataModels = new ArrayList<>();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getNearbyMarkers(); //refresh
     }
 
     @Override
@@ -100,12 +118,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     //    Button for adding a new note
     public void viewNotes(View view) {
-        Intent myIntent = new Intent(this, viewNotes.class);
-        myIntent.putExtra("lat", lat); //Optional parameters
-        myIntent.putExtra("lng", lng); //Optional parameters
-        this.startActivity(myIntent);
+
+        View drawer = findViewById(R.id.drawer);
+
+        if (drawer.getVisibility() == View.GONE) {
+            drawer.setVisibility(View.VISIBLE);
+        } else {
+            drawer.setVisibility(View.GONE);
+        }
+
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        View drawer = findViewById(R.id.drawer);
+        if(drawer.getVisibility()==View.VISIBLE){
+            drawer.setVisibility(View.GONE);
+        }else{
+            super.onBackPressed();  // optional depending on your needs
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -119,56 +152,37 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-//        LatLng sydney = new LatLng(-34, 151);
-//        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        updateUI();
     }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-//        public void requestLocationFromGoogle {
-//            mLocationRequest = LocationRequest.create();
-//            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//            mLocationRequest.setInterval(600000); // Update location every minute
-//        }
-
-
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            //return;
-
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSION_ACCESS_FINE_LOCATION);
 
 
-        }else{
+        } else {
             //I have permission
+            mMap.setMyLocationEnabled(true); //show the mylocation button
+
             mLocationRequest = LocationRequest.create();
             mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            mLocationRequest.setInterval(600000); // Update location every minute
+            mLocationRequest.setInterval(10000); // Update location 10s
 
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                     mGoogleApiClient);
             if (mLastLocation != null) {
-                lat = String.valueOf(mLastLocation.getLatitude());
-                lng = String.valueOf(mLastLocation.getLongitude());
+                lat = mLastLocation.getLatitude();
+                lng = mLastLocation.getLongitude();
             }
             updateUI();
         }
-
 
 
     }
@@ -180,9 +194,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onLocationChanged(Location location) {
-        lat = String.valueOf(location.getLatitude());
-        lng = String.valueOf(location.getLongitude());
-        updateUI();
+        lat = location.getLatitude();
+        lng = location.getLongitude();
+        LatLng myLocation = new LatLng(lat, lng);
+
+        //don't move the camera from this call because it updates like every second
+        //Log.v("MainActivity","Location changed onLocationChanged" + lat + lng );
     }
 
     @Override
@@ -198,21 +215,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
-
-
     }
-
-    RequestQueue requestQueue;
 
 
     //Get Nearby note markers
+    RequestQueue requestQueue;
+
     public void getNearbyMarkers() {
         //String JsonURL = "http://192.168.1.10/geonotes/api/nearbyMarkers.php?lat="+lat+"&lng="+lng;
         String apiURL = getResources().getString(R.string.apiURL);
         String JsonURL = apiURL + "nearbyMarkers.php?lat=" + lat + "&lng=" + lng;
-
-
-        //String JsonURL = "http://192.168.1.10/geonotes/api/add.php?user="+user+"&lat="+lat+"&lng="+lng+"&type="+type+"&data="+note;
+        Log.v(TAG, "Attempting to get" + JsonURL);
 
         // Creating the JsonObjectRequest class called obreq, passing required parameters:
         //GET is used to fetch data from the server, JsonURL is the URL to be fetched from.
@@ -227,37 +240,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         try {
 
                             String listOfLocations = "";
+                            dataModels.clear(); // Clear all markers from dataModel
+                            mMap.clear(); // Clear all markers from map
 
                             int id;
                             double markerLat;
                             double markerLng;
                             String note = "";
                             String timestamp = "";
-                            JSONArray array = new JSONArray(response.getString("notes"));
-                            for (int i = 0; i < array.length(); i++) {
-                                JSONObject row = array.getJSONObject(i);
+                            JSONArray noteArray = new JSONArray(response.getString("notes"));
+                            for (int i = 0; i < noteArray.length(); i++) {
+                                JSONObject row = noteArray.getJSONObject(i);
                                 id = row.getInt("id");
                                 markerLat = row.getDouble("lat");
                                 markerLng = row.getDouble("lng");
                                 timestamp = row.getString("timestamp");
+                                String username = row.getString("user");
                                 note = row.getString("data");
                                 //Log.v(TAG, "Adding marker id" + id + note);
 
                                 listOfLocations = listOfLocations + id + " LAT: " + markerLat + "\n";
 
                                 //LatLng sydney = new LatLng(markerLat, markerLng);
-                                mMap.addMarker(new MarkerOptions().position(new LatLng(markerLat, markerLng)).title("N" + id + " " + note));
+                                mMap.addMarker(new MarkerOptions().position(new LatLng(markerLat, markerLng)).title(username).snippet(note + "\n" + timestamp));
+                                dataModels.add(new DataModel(username, timestamp, note, "Feature", markerLat, markerLng));
                             }
-
-//
-//                            mMap.addMarker(new MarkerOptions().position(new LatLng(36.17,-115.17)).title("mess"));
-//                            mMap.addMarker(new MarkerOptions().position(new LatLng(36.07,-115.07)).title("mess2"));
-//                            mMap.addMarker(new MarkerOptions().position(new LatLng(36.47,-115.47)).title("mess3"));
-
-//                            TextView jsonResultsTextView = (TextView) findViewById(R.id.jsonResults);
-//                            jsonResultsTextView.setText(listOfLocations);
-
-
+                            //Redraw Current Location Marker
+                            //LatLng myLocation = new LatLng(lat, lng);
+                            //mMap.addMarker(new MarkerOptions().position(myLocation).title("You are here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                         }
 
 
@@ -280,16 +290,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
         // Adds the JSON object request "obreq" to the request queue
         requestQueue.add(obreq);
+
+
+//        //Begin View Notes Stuff
+//        listView=(ListView)findViewById(R.id.list);
+//        dataModels= new ArrayList<>();
+//        dataModels.add(new DataModel("Geoman", "2016-10-12", "1","September 23, 2008"));
+//        dataModels.add(new DataModel("searchuser", "2016-10-5", "2","February 9, 2009"));
+
+
+        adapter = new CustomAdapter(dataModels, getApplicationContext());
+
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                DataModel dataModel = dataModels.get(position);
+
+//                Snackbar.make(view, dataModel.getName() + "\n" + dataModel.getTimestamp() + " API: " + dataModel.getNote(), Snackbar.LENGTH_LONG)
+//                        .setAction("No action", null).show();
+
+                LatLng aLocation = new LatLng(dataModel.getDataLat(), dataModel.getDataLng());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(aLocation));
+
+            }
+        });
+        //End view notes stuff
+
     }
 
     void updateUI() {
-        txtOutputLat.setText(lat);
-        txtOutputLng.setText(lng);
+        //       txtOutputLat.setText(String.valueOf(lat));
+//        txtOutputLng.setText(String.valueOf(lng));
 
         //zoom in once I have my location
-        LatLng myLocation = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+        LatLng myLocation = new LatLng(lat, lng);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(16));
+        Log.v(TAG, "updating ui... " + "myLocation: " + myLocation.toString());
+
+
+        mMap.addMarker(new MarkerOptions().position(myLocation).title("You are here").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         getNearbyMarkers();
     }
