@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="note_ideas">
+        <item>This place smells funny 😱</item>
+        <item>This place is really fun ❤</item>
+        <item>️Order the food here 🍞</item>
+        <item>Bartender is fierce! ️😭</item>
+        <item>zomg ❤ it here</item>
+    </string-array>
+</resources>

@@ -23,10 +23,11 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Random;
 
 public class addNote extends AppCompatActivity {
-    String lat;
-    String lng;
+    double lat;
+    double lng;
     String TAG = "addNote";
     //Shared Preferences Name
     public static final String PREFS_NAME = "geonotesPrefs";
@@ -45,16 +46,47 @@ public class addNote extends AppCompatActivity {
     //This is the button handler for submit note
     public void submitNote(View view) {
 
+        //Get Username
         TextView userTextView = (TextView) findViewById(R.id.user);
         String user = userTextView.getText().toString();
 
+
 //        TextView typeTextView = (TextView) findViewById(R.id.type);
 //        String type = typeTextView.getText().toString();
-        String type = "text";
+        String type = "text"; //type of note being submitted
 
         final TextView noteTextView = (TextView) findViewById(R.id.note);
-
         String note = noteTextView.getText().toString();
+
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_LONG;
+
+        //test if username is something. No blank usernames.
+        if(user.length()<1){
+            CharSequence text = "Please add a username";
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+        //test if location is 0
+        if(lat==0.0){
+            CharSequence text = "Your Location is broken";
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+
+        //test if note is 0
+        if(note.length()<1){
+            CharSequence text = "You need to type a note";
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            return;
+        }
+
+
         try {
             note = URLEncoder.encode(note, "utf-8");
         } catch (UnsupportedEncodingException e) {
@@ -139,12 +171,19 @@ public class addNote extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
         Intent intent = getIntent();
-        lat = intent.getStringExtra("lat"); //if it's a string you stored.
-        lng = intent.getStringExtra("lng");
+        lat = intent.getDoubleExtra("lat",0); //if it's a string you stored.
+        lng = intent.getDoubleExtra("lng",0);
+        Log.v(TAG,"gonna make with " + lat);
 
         TextView debugTextView = (TextView) findViewById(R.id.debug);
-        debugTextView.setText(lat + lng);
+        debugTextView.setText(String.valueOf(lat) + " × " + String.valueOf(lng));
 
+
+        //Suggest a nice idea for a comment note
+        EditText note = (EditText) findViewById(R.id.note); //find note field
+        String[] array = this.getResources().getStringArray(R.array.note_ideas); //get array of note ideas
+        String randomStr = array[new Random().nextInt(array.length)]; //pick one
+        note.setHint(randomStr); //set hint
 
         //Gets username from SharedPreferences
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
@@ -171,7 +210,9 @@ public class addNote extends AppCompatActivity {
 
         //save username to SharedPreferences
         EditText username = (EditText) findViewById(R.id.user);
-        Log.v("Addnote", "saving username to prefs" + username.getText().toString());
+
+        Log.e("Addnote", "saving username to prefs: " + username.getText().toString());
+
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();

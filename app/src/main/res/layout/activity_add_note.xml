@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -14,20 +12,27 @@
         android:paddingTop="@dimen/activity_vertical_margin"
         tools:context="tacos.vegas.geonotes.addNote">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
         <EditText
             android:id="@+id/note"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:gravity="top|left"
             android:hint="@string/addNoteHintText"
             android:inputType="textMultiLine"
-            android:minLines="3"/>
+            android:minLines="3"
+            />
+    </LinearLayout>
+
 
 
         <!--hangous bar-->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <ImageView
@@ -40,6 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="geouser"
+                android:hint="username"
                 android:layout_weight="1"
                 android:textAlignment="center"
                 android:paddingRight="16dp"
@@ -61,13 +67,14 @@
             android:id="@+id/debug"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lat: 123, Lng: 123" />
+            android:text="Lat: 123, Lng: 123"
+            android:textAlignment="center"
+            android:textColor="#ccc"
+            android:textSize="8sp"
+            android:textIsSelectable="true" />
 
         <TextView
             android:id="@+id/jsonData"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Results" />
+            android:layout_height="wrap_content" />
     </LinearLayout>
-
-</ScrollView>
