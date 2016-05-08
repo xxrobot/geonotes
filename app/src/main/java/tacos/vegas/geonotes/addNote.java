@@ -150,7 +150,7 @@ public class addNote extends AppCompatActivity {
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         String username = settings.getString("username", "geouser");
 
-        Log.e("Addnote", "try to get username in prefs: " + username);
+        Log.v("Addnote", "try to get username in prefs: " + username);
 
         TextView myUsername = (TextView) findViewById(R.id.user);
         myUsername.setText(username);
@@ -171,7 +171,7 @@ public class addNote extends AppCompatActivity {
 
         //save username to SharedPreferences
         EditText username = (EditText) findViewById(R.id.user);
-        Log.e("Addnote", "saving username to prefs" + username.getText().toString());
+        Log.v("Addnote", "saving username to prefs" + username.getText().toString());
 
         SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
