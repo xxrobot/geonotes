@@ -17,7 +17,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:context="tacos.vegas.geonotes.MainActivity" />
+            tools:context="vegas.tacos.geonotes.MainActivity" />
     </FrameLayout>
 
 

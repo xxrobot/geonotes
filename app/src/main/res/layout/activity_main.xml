@@ -48,7 +48,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
-                tools:context="tacos.vegas.geonotes.MainActivity" />
+                tools:context="vegas.tacos.geonotes.MainActivity" />
         </LinearLayout>
 
         <LinearLayout

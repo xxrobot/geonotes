@@ -1,4 +1,4 @@
-package tacos.vegas.geonotes;
+package vegas.tacos.geonotes;
 
 import android.content.Context;
 import android.content.Intent;

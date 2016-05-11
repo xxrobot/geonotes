@@ -1,4 +1,4 @@
-package tacos.vegas.geonotes;
+package vegas.tacos.geonotes;
 
 /**
  * Created by scottsasaki on 5/6/16.
